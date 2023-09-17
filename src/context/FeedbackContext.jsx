@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 
 import { createContext, useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 
 const FeedbackContext = createContext();
 
@@ -19,17 +18,28 @@ export const FeedbackProvider = ({ children }) => {
 
   // Fetch feedback
   const fetchFeedback = async () => {
-    // const response = await fetch("/feedback?_sort=id&_order=desc");
-    const response = await fetch("/api/feedback");
+    const response = await fetch("/api/feedback?_sort=id&_order=desc");
+    // const response = await fetch("/api/feedback");
     const data = await response.json();
     setFeedback(data);
     setIsLoading(false);
   };
 
-  const addFeedback = (newFeedback) => {
-    newFeedback.id = uuidv4();
+  const addFeedback = async (newFeedback) => {
+    const response = await fetch(`/api/feedback`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newFeedback),
+    });
 
-    setFeedback([newFeedback, ...feedback]);
+    const data = await response.json();
+
+    // not necessary with the server, is created automatically
+    // newFeedback.id = uuidv4();
+
+    setFeedback([data, ...feedback]);
   };
 
   const deleteFeedback = (id) => {
